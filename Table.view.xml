@@ -1,0 +1,124 @@
+<mvc:View controllerName="sap.m.sample.Table.Table" xmlns:fb="sap.ui.comp.filterbar" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
+	xmlns="sap.m" >
+	<!--Filter Bar-->
+	<fb:FilterBar useToolbar="false" id="filterBar" reset="onReset" search="onSearch" clear="onClear" cancel="onCancel"
+		filtersDialogClosed="onFiltersDialogClosed" width="auto">
+		<fb:filterGroupItems>
+			<fb:FilterGroupItem label="{i18n>filterNameProduct}" groupName="__$INTERNAL$" partOfCurrentVariant="true" visibleInFilterBar="true"
+				name="filterProduct">
+				<fb:control>
+					<SearchField id="productSearchField" suggestionItems="{ path: '/ProductCollection', sorter: { path: 'Name' } }" enableSuggestions="true"
+						suggest="onSuggest" search=".onSearch">
+						<suggestionItems>
+							<SuggestionItem text="{Name}" key="{ProductId}"/>
+						</suggestionItems>
+						<layoutData>
+							<OverflowToolbarLayoutData maxWidth="200px" priority="NeverOverflow"/>
+						</layoutData>
+					</SearchField>
+				</fb:control>
+			</fb:FilterGroupItem>
+			<fb:FilterGroupItem label="{i18n>filterLabelSupplier}" groupName="__$INTERNAL$" partOfCurrentVariant="true" visibleInFilterBar="true"
+				name="filterSupplier">
+				<fb:control>
+					<SearchField id="supplierSearchField" search=".onSearch">
+						<layoutData>
+							<OverflowToolbarLayoutData maxWidth="200px" priority="NeverOverflow"/>
+						</layoutData>
+					</SearchField>
+				</fb:control>
+			</fb:FilterGroupItem>
+			<fb:FilterGroupItem groupName="__$INTERNAL$" name="Weight" label="{i18n>filterLabelWeight}" partOfCurrentVariant="true"
+				visibleInFilterBar="true">
+				<fb:control>
+					<Slider id="weightSlider" value="140" min="0" max="140" step="5" change="filterWeight" width="100%"/>
+				</fb:control>
+			</fb:FilterGroupItem>
+			<fb:FilterGroupItem groupName="__$INTERNAL$" name="c" label="{i18n>filterLabelPrice}" partOfCurrentVariant="true" visibleInFilterBar="true">
+				<fb:control>
+					<Select id="priceSelect" change="onPriceSelect"
+					forceSelection="false">
+						<core:ListItem key="Cheap" text="{i18n>filterOptionCheap}" icon="sap-icon://waiver" />
+						<core:ListItem key="Medium" text="{i18n>filterOptionMedium}" icon="sap-icon://loan" />
+						<core:ListItem key="Expensive" text="{i18n>filterOptionExpensive}" icon="sap-icon://money-bills" />
+						
+				</Select>
+				</fb:control>
+			</fb:FilterGroupItem>
+		</fb:filterGroupItems>
+	</fb:FilterBar>
+	<Table id="idProductsTable" inset="false" items="{ path: '/ProductCollection', sorter: { path: 'Name' } }">
+		<headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<Title text="{i18n>headerTitleText}" level="H2"/>
+					<ToolbarSpacer/>
+					<ComboBox id="idPopinLayout" placeholder="{i18n>comboBoxPlaceholderPopin}" change="onPopinLayoutChanged">
+						<items>
+							<core:Item text="Block" key="Block"/>
+							<core:Item text="Grid Large" key="GridLarge"/>
+							<core:Item text="Grid Small" key="GridSmall"/>
+						</items>
+					</ComboBox>
+					<MultiComboBox id="idSticky" placeholder="{i18n>comboBoxPlaceholderSticky}" selectionFinish="onSelectionFinish" width="15%">
+						<layoutData>
+							<ToolbarLayoutData minWidth="4rem"/>
+						</layoutData>
+						<items>
+							<core:Item text="Column headers" key="ColumnHeaders"/>
+							<core:Item text="Header Toolbar" key="HeaderToolbar"/>
+							<core:Item text="Info Toolbar" key="InfoToolbar"/>
+						</items>
+					</MultiComboBox>
+					<ToggleButton id="toggleInfoToolbar" text="{i18n>toggleToolbarHideButton}" press="onToggleInfoToolbar"/>
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+		<infoToolbar>
+			<Toolbar active="ture">
+				<Label text="{i18n>toolbarLabelText}"/>
+			</Toolbar>
+		</infoToolbar>
+		<columns>
+			<Column width="12em">
+				<Text text="{i18n>tableColumnTitleProduct}"/>
+				<footer>
+					<Text text="{i18n>footerTotal}"/>
+				</footer>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>tableColumnTitleSupplier}"/>
+			</Column>
+			<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+				<Text text="{i18n>tableColumnTitleDimensions}"/>
+			</Column>
+			<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Center">
+				<Text text="{i18n>tableColumnTitleWeight}"/>
+				<footer>
+					<ObjectNumber id="weightTotal"/>
+				</footer>
+			</Column>
+			<Column hAlign="End">
+				<Text text="{i18n>tableColumnTitlePrice}"/>
+				<footer>
+					<ObjectNumber id="priceTotal"
+						number="{formatter: '.formatter.price', type: 'sap.ui.model.type.Currency', formatOptions: {showMeasure: true}}"/>
+				</footer>
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem press=".onPress" type="Active">
+				<cells>
+					<ObjectIdentifier title="{Name}" text="{ProductId}"/>
+					<Text text="{SupplierName}"/>
+					<Text text="{Width} x {Depth} x {Height} {DimUnit}"/>
+					<ObjectNumber number="{ path: 'WeightMeasure', type: 'sap.ui.model.type.Number', formatOptions: {}}" unit="{WeightUnit}"
+						state="{ parts: [ {path: 'WeightMeasure'}, {path: 'WeightUnit'} ], formatter: 'sap.m.sample.Table.Formatter.weightState' }"/>
+					<ObjectNumber
+						number="{ parts:[{path:'Price'},{path:'CurrencyCode'}], type: 'sap.ui.model.type.Currency', formatOptions: {showMeasure: false} }"
+						unit="{CurrencyCode}"/>
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+</mvc:View>
