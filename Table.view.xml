@@ -31,7 +31,7 @@
 			<fb:FilterGroupItem groupName="__$INTERNAL$" name="Weight" label="{i18n>filterLabelWeight}" partOfCurrentVariant="true"
 				visibleInFilterBar="true">
 				<fb:control>
-					<Slider id="weightSlider" value="140" min="0" max="140" step="5" change="filterWeight" width="100%"/>
+					<Slider id="weightSlider" value="140" min="0" max="40" step="5" change="filterWeight" width="100%"/>
 				</fb:control>
 			</fb:FilterGroupItem>
 			<fb:FilterGroupItem groupName="__$INTERNAL$" name="c" label="{i18n>filterLabelPrice}" partOfCurrentVariant="true" visibleInFilterBar="true">

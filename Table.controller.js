@@ -53,8 +53,12 @@ sap.ui.define([
 			var oWeightSlider = this.getView().byId("weightSlider");
 			oWeightSlider.setValue(nMaxWeight);
 			this._aTableSearchState = [];
-
-			this._aTableSearchState.push(new Filter("WeightMeasure", FilterOperator.LT, nMaxWeight));
+			var oFilterG = new Filter([new Filter("WeightMeasure", FilterOperator.LT, nMaxWeight * 1000), new Filter("WeightUnit",
+				FilterOperator.EQ, "G")], true);
+			var oFilterKG = new Filter([new Filter("WeightMeasure", FilterOperator.LT, nMaxWeight), new Filter("WeightUnit", FilterOperator.EQ,
+				"KG")], true);
+			//	var oResultingFilter = ;
+			this._aTableSearchState.push(new Filter([oFilterG, oFilterKG], false));
 			this._applySearch(this._aTableSearchState);
 			var oTable = this.getView().byId("idProductsTable"),
 				aTableItems = oTable.getItems();
@@ -90,8 +94,7 @@ sap.ui.define([
 			this.getView().byId("priceSelect").setSelectedKey(sKey);
 			this._aTableSearchState = [];
 
-			var oFilter = new Filter("Price");
-			oFilter.fnTest = function (value) {
+			function fnTest (value) {
 				switch (sKey) {
 				case "Cheap":
 					return value < 50;
@@ -100,7 +103,9 @@ sap.ui.define([
 				case "Expensive":
 					return value > 100;
 				}
-			};
+			}
+			var oFilter = new Filter("Price", fnTest);
+			
 
 			this._aTableSearchState.push(oFilter);
 			this._applySearch(this._aTableSearchState);
