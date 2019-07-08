@@ -46,20 +46,26 @@ sap.ui.define([
 
 		},
 
+		/**
+		 * Event handler when slider gets changed 
+		 * @public
+		 * @param {sap.ui.base.Event} oEvent the slider change event
+		 */
+
 		filterWeight: function (oEvent) {
 			this.filtersRefresh();
 			var nMaxWeight = oEvent.getParameters().value;
-			//as it was refreshed, we have to set value again
+			// as it was refreshed, the value needs to be set again
 			var oWeightSlider = this.getView().byId("weightSlider");
 			oWeightSlider.setValue(nMaxWeight);
-			this._aTableSearchState = [];
+
 			var oFilterG = new Filter([new Filter("WeightMeasure", FilterOperator.LT, nMaxWeight * 1000), new Filter("WeightUnit",
 				FilterOperator.EQ, "G")], true);
 			var oFilterKG = new Filter([new Filter("WeightMeasure", FilterOperator.LT, nMaxWeight), new Filter("WeightUnit", FilterOperator.EQ,
 				"KG")], true);
 			//	var oResultingFilter = ;
 			this._aTableSearchState.push(new Filter([oFilterG, oFilterKG], false));
-			this._applySearch(this._aTableSearchState);
+			this._applySearch();
 			var oTable = this.getView().byId("idProductsTable"),
 				aTableItems = oTable.getItems();
 			this._fnAggregate(aTableItems);
@@ -87,15 +93,21 @@ sap.ui.define([
 			);
 		},
 
+		/**
+		 * Event handler when a  priceSelect ListItem gets pressed
+		 * @param {sap.ui.base.Event} oEvent the select change event
+		 * @public
+		 */
 		onPriceSelect: function (oEvent) {
 			this.filtersRefresh();
 			var sKey = oEvent.getParameters().selectedItem.getKey();
 			//as it was refreshed, we have to set value again
 			this.getView().byId("priceSelect").setSelectedKey(sKey);
-			this._aTableSearchState = [];
 
-			function fnTest (value) {
+			function fnTest(value) {
 				switch (sKey) {
+				case "All":
+					return true;
 				case "Cheap":
 					return value < 50;
 				case "Medium":
@@ -105,16 +117,16 @@ sap.ui.define([
 				}
 			}
 			var oFilter = new Filter("Price", fnTest);
-			
 
 			this._aTableSearchState.push(oFilter);
-			this._applySearch(this._aTableSearchState);
+			this._applySearch();
 			var oTable = this.getView().byId("idProductsTable"),
 				aTableItems = oTable.getItems();
 			this._fnAggregate(aTableItems);
 
 		},
 
+		/* sap.m.Table control's sample method*/
 		onPopinLayoutChanged: function () {
 			var oTable = this.byId("idProductsTable");
 			var oComboBox = this.byId("idPopinLayout");
@@ -135,11 +147,18 @@ sap.ui.define([
 			}
 		},
 
+		/**
+		 * Event handler when a SearchField state gets changed 
+		 * @param {sap.ui.base.Event} oEvent the SearchField search event
+		 * @public
+		 */
 		onSearch: function (oEvent) {
-			var sSFID = oEvent.getSource().getId(); //sSFID - search field ID
-
-			this._aTableSearchState = [];
 			var sQuery = oEvent.getParameter("query");
+			this.filtersRefresh();
+			if (oEvent.getParameters().id.includes("SearchField")) {
+				oEvent.getSource().setValue(sQuery);
+			}
+			var sSFID = oEvent.getSource().getId(); //sSFID - search field ID
 
 			if (sQuery && sQuery.length > 0) {
 				if (sSFID.includes("supplierSearchField")) {
@@ -151,14 +170,15 @@ sap.ui.define([
 					this.getView().byId("supplierSearchField").setValue("");
 				}
 			}
-			this._applySearch(this._aTableSearchState);
+			this._applySearch();
 
 			var oTable = this.getView().byId("idProductsTable"),
 				aTableItems = oTable.getItems();
 			this._fnAggregate(aTableItems);
-			this.filtersRefresh();
+
 		},
 
+		/* sap.m.Table control's sample method*/
 		onSelectionFinish: function (oEvent) {
 			var aSelectedItems = oEvent.getParameter("selectedItems");
 			var oTable = this.byId("idProductsTable");
@@ -169,10 +189,17 @@ sap.ui.define([
 			oTable.setSticky(aSticky);
 		},
 
+		/* sap.m.Table control's sample method*/
 		onToggleInfoToolbar: function (oEvent) {
 			var oTable = this.byId("idProductsTable");
 			oTable.getInfoToolbar().setVisible(!oEvent.getParameter("pressed"));
 		},
+
+		/**
+		 * Event handler when a SearchField state gets changed 
+		 * @param {sap.ui.base.Event} event - the SearchField suggest event
+		 * @public
+		 */
 		onSuggest: function (event) {
 
 			var value = event.getParameter("suggestValue"),
@@ -193,6 +220,11 @@ sap.ui.define([
 		/* internal methods                                            */
 		/* =========================================================== */
 
+		/**
+		 * Aggregates all the tables's items 
+		 * @param {Object[]} aItems - all table items
+		 * @private
+		 */
 		_fnAggregate: function (aItems) {
 
 			var nTotalWeight = 0,
@@ -224,15 +256,14 @@ sap.ui.define([
 		},
 		/**
 		 * Internal helper method to apply both filter and search state together on the list binding
-		 * @param {sap.ui.model.Filter[]} aTableSearchState An array of filters for the search
 		 * @private
 		 */
-		_applySearch: function (aTableSearchState) {
+		_applySearch: function () {
 			var oTable = this.byId("idProductsTable");
 
-			oTable.getBinding("items").filter(aTableSearchState);
+			oTable.getBinding("items").filter(this._aTableSearchState);
 			// changes the noDataText of the list in case there are no filter results
-
+			this._aTableSearchState = [];
 		}
 
 	});

@@ -1,8 +1,8 @@
 <mvc:View controllerName="sap.m.sample.Table.Table" xmlns:fb="sap.ui.comp.filterbar" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core"
-	xmlns="sap.m" >
+	xmlns="sap.m">
 	<!--Filter Bar-->
 	<fb:FilterBar useToolbar="false" id="filterBar" reset="onReset" search="onSearch" clear="onClear" cancel="onCancel"
-		filtersDialogClosed="onFiltersDialogClosed" width="auto">
+		filtersDialogClosed="onFiltersDialogClosed" showFilterConfiguration="false" width="auto" showGoOnFB="false">
 		<fb:filterGroupItems>
 			<fb:FilterGroupItem label="{i18n>filterNameProduct}" groupName="__$INTERNAL$" partOfCurrentVariant="true" visibleInFilterBar="true"
 				name="filterProduct">
@@ -36,13 +36,12 @@
 			</fb:FilterGroupItem>
 			<fb:FilterGroupItem groupName="__$INTERNAL$" name="c" label="{i18n>filterLabelPrice}" partOfCurrentVariant="true" visibleInFilterBar="true">
 				<fb:control>
-					<Select id="priceSelect" change="onPriceSelect"
-					forceSelection="false">
-						<core:ListItem key="Cheap" text="{i18n>filterOptionCheap}" icon="sap-icon://waiver" />
-						<core:ListItem key="Medium" text="{i18n>filterOptionMedium}" icon="sap-icon://loan" />
-						<core:ListItem key="Expensive" text="{i18n>filterOptionExpensive}" icon="sap-icon://money-bills" />
-						
-				</Select>
+					<Select id="priceSelect" selectedKey="All" change="onPriceSelect" forceSelection="false">
+						<core:ListItem key="All" text="{i18n>filterOptionAll}"/>
+						<core:ListItem key="Cheap" text="{i18n>filterOptionCheap}" icon="sap-icon://waiver"/>
+						<core:ListItem key="Medium" text="{i18n>filterOptionMedium}" icon="sap-icon://loan"/>
+						<core:ListItem key="Expensive" text="{i18n>filterOptionExpensive}" icon="sap-icon://money-bills"/>
+					</Select>
 				</fb:control>
 			</fb:FilterGroupItem>
 		</fb:filterGroupItems>
