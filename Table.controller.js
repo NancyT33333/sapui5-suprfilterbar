@@ -3,10 +3,13 @@ sap.ui.define([
 	'sap/m/MessageBox',
 	'sap/ui/core/mvc/Controller',
 	'sap/ui/model/json/JSONModel',
-	"sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator"
+	'sap/ui/model/Filter',
+	'sap/ui/model/FilterOperator',
+	'sap/m/Dialog',
+	'sap/m/Image',
+	'sap/m/Button'
 
-], function (Formatter, MessageBox, Controller, JSONModel, Filter, FilterOperator) {
+], function (Formatter, MessageBox, Controller, JSONModel, Filter, FilterOperator, Dialog, Image, Button) {
 	"use strict";
 
 	var TableController = Controller.extend("sap.m.sample.Table.Table", {
@@ -20,9 +23,8 @@ sap.ui.define([
 			this._aTableSearchState = [];
 			var that = this;
 			oModel.dataLoaded().then(function (data) {
-				var oTable = that.getView().byId("idProductsTable");
-				var aTableItems = oTable.getItems();
-				that._fnAggregate(aTableItems);
+		
+				that._fnAggregate();
 
 			});
 		},
@@ -52,7 +54,7 @@ sap.ui.define([
 		 * @param {sap.ui.base.Event} oEvent the slider change event
 		 */
 
-		filterWeight: function (oEvent) {
+		onFilterWeight: function (oEvent) {
 			this.filtersRefresh();
 			var nMaxWeight = oEvent.getParameters().value;
 			// as it was refreshed, the value needs to be set again
@@ -66,10 +68,39 @@ sap.ui.define([
 			//	var oResultingFilter = ;
 			this._aTableSearchState.push(new Filter([oFilterG, oFilterKG], false));
 			this._applySearch();
-			var oTable = this.getView().byId("idProductsTable"),
-				aTableItems = oTable.getItems();
-			this._fnAggregate(aTableItems);
+		
+			this._fnAggregate();
 
+		},
+		/**
+		 * Event handler when an image gets pressed
+		 * @param {sap.ui.base.Event} oEvent the image's press event
+		 * @public
+		 */
+		
+		onImageMessagePress: function (oEvent) {
+			//sPath = oEvent.getElementBinding get path + "ProductPicUrl"
+		//	sPath = this.getView().byId(oEvent.getParameter("id"));
+		var sPath = "";
+			var dialog = new Dialog({
+				title: 'Information',
+				type: 'Message',
+				state: 'Information',
+				content: new Image({
+					src: sPath
+				}),
+				beginButton: new Button({
+					text: 'OK',
+					press: function () {
+						dialog.close();
+					}
+				}),
+				afterClose: function() {
+					dialog.destroy();
+				}
+			});
+
+			dialog.open();
 		},
 
 		/**
@@ -120,9 +151,8 @@ sap.ui.define([
 
 			this._aTableSearchState.push(oFilter);
 			this._applySearch();
-			var oTable = this.getView().byId("idProductsTable"),
-				aTableItems = oTable.getItems();
-			this._fnAggregate(aTableItems);
+		
+			this._fnAggregate();
 
 		},
 
@@ -171,10 +201,8 @@ sap.ui.define([
 				}
 			}
 			this._applySearch();
-
-			var oTable = this.getView().byId("idProductsTable"),
-				aTableItems = oTable.getItems();
-			this._fnAggregate(aTableItems);
+		
+			this._fnAggregate();
 
 		},
 
@@ -208,7 +236,7 @@ sap.ui.define([
 			var filters = [];
 			if (value) {
 				filters = [
-					new sap.ui.model.Filter("Name", FilterOperator.StartsWith, value)
+					new Filter("Name", FilterOperator.StartsWith, value)
 				];
 			}
 
@@ -225,32 +253,32 @@ sap.ui.define([
 		 * @param {Object[]} aItems - all table items
 		 * @private
 		 */
-		_fnAggregate: function (aItems) {
-
-			var nTotalWeight = 0,
-				nTotalPrice = 0,
-				formatter = this.formatter;
+		_fnAggregate: function () {
+			var oTable = this.getView().byId("idProductsTable"),
+				aItems = oTable.getItems();
+			var fTotalWeight = 0,
+				fTotalPrice = 0;
+			
 
 			aItems.forEach(function (item) {
-				var aCells = item.getCells(),
-					sWeightUnit = aCells[3].getUnit(),
-					nWeightMeasure = Number(aCells[3].getNumber()),
-					nPrice = aCells[4].getNumber();
-				nPrice = formatter.priceParse(nPrice)[0];
+				var fWeightMeasure = item.getBindingContext().getProperty("WeightMeasure"),
+					sWeightUnit = item.getBindingContext().getProperty("WeightUnit"),
+					fPrice = item.getBindingContext().getProperty("Price");
+			
 
 				if (sWeightUnit === "G") {
-					nWeightMeasure = nWeightMeasure / 1000;
+					fWeightMeasure = fWeightMeasure / 1000;
 				}
-				nTotalWeight += nWeightMeasure;
-				nTotalPrice += nPrice;
+				fTotalWeight += fWeightMeasure;
+				fTotalPrice += fPrice;
 			});
 
-			nTotalPrice = this.formatter.price(nTotalPrice);
-			nTotalWeight = this.formatter.weight(nTotalWeight);
+			fTotalPrice = this.formatter.price(fTotalPrice);
+			fTotalWeight = this.formatter.weight(fTotalWeight);
 			var oWeightTotal = this.byId("weightTotal"),
 				oPriceTotal = this.byId("priceTotal");
-			oWeightTotal.setNumber(nTotalWeight);
-			oPriceTotal.setNumber(nTotalPrice);
+			oWeightTotal.setNumber(fTotalWeight);
+			oPriceTotal.setNumber(fTotalPrice);
 			oWeightTotal.setUnit("KG");
 
 		},
@@ -261,7 +289,7 @@ sap.ui.define([
 		_applySearch: function () {
 			var oTable = this.byId("idProductsTable");
 
-			oTable.getBinding("items").filter(this._aTableSearchState);
+			oTable.getBinding("items").filter(this._aTableSearchState, sap.ui.model.FilterType.Application);
 			// changes the noDataText of the list in case there are no filter results
 			this._aTableSearchState = [];
 		}

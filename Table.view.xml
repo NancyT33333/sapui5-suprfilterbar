@@ -31,7 +31,7 @@
 			<fb:FilterGroupItem groupName="__$INTERNAL$" name="Weight" label="{i18n>filterLabelWeight}" partOfCurrentVariant="true"
 				visibleInFilterBar="true">
 				<fb:control>
-					<Slider id="weightSlider" value="140" min="0" max="40" step="5" change="filterWeight" width="100%"/>
+					<Slider id="weightSlider" value="140" min="0" max="40" step="5" change="onFilterWeight" width="100%"/>
 				</fb:control>
 			</fb:FilterGroupItem>
 			<fb:FilterGroupItem groupName="__$INTERNAL$" name="c" label="{i18n>filterLabelPrice}" partOfCurrentVariant="true" visibleInFilterBar="true">
@@ -79,6 +79,9 @@
 			</Toolbar>
 		</infoToolbar>
 		<columns>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Text text="{i18n>tableColumnTitleImage}"/>
+			</Column>
 			<Column width="12em">
 				<Text text="{i18n>tableColumnTitleProduct}"/>
 				<footer>
@@ -108,6 +111,7 @@
 		<items>
 			<ColumnListItem press=".onPress" type="Active">
 				<cells>
+					<Image mode="Image" alt="{i18n>productImageAlt}" press="onImageMessagePress" height="150px" src="{ProductPicUrl}"></Image>
 					<ObjectIdentifier title="{Name}" text="{ProductId}"/>
 					<Text text="{SupplierName}"/>
 					<Text text="{Width} x {Depth} x {Height} {DimUnit}"/>
