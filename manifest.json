@@ -1,6 +1,7 @@
 {
 	"sap.app": {
 		"id": "sap.m.sample.Table",
+		"i18n": "i18n/i18n.properties",
 		"applicationVersion": {
 			"version": "1.0.0"
 		}
